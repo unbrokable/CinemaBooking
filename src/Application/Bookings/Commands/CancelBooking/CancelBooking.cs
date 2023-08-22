@@ -15,12 +15,17 @@ public class CancelBookingCommandHandler : IRequestHandler<CancelBookingCommand>
 
     public async Task Handle(CancelBookingCommand request, CancellationToken cancellationToken)
     {
-        var entities = await _context.Bookings
+        var entity = await _context.Bookings
             .Include(b => b.Seats)
             .FirstAsync(b => b.Id == request.Id);
 
-        entities.Status = "Cancelled";
-        entities.Seats = entities.Seats.Select(s =>
+        if (entity.Status == "Confirmed")
+        {
+            return;
+        }
+
+        entity.Status = "Cancelled";
+        entity.Seats = entity.Seats.Select(s =>
             {
                 s.IsReserved = false;
                 return s;

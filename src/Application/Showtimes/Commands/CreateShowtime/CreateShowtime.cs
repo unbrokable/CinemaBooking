@@ -1,6 +1,8 @@
-﻿namespace CinemaBooking.Application.Showtimes.Commands.CreateShowtime;
+﻿using CinemaBooking.Application.Common.Model;
 
-public record CreateShowtimeCommand : IRequest<int>
+namespace CinemaBooking.Application.Showtimes.Commands.CreateShowtime;
+
+public record CreateShowtimeCommand : IRequest<CreatedResponse>
 {
     public DateTimeOffset DateTime { get; set; }
 
@@ -14,7 +16,7 @@ public record CreateShowtimeCommand : IRequest<int>
     public IEnumerable<ShowSeatCreateDto> AvailableSeats { get; set; } = Enumerable.Empty<ShowSeatCreateDto>();
 }
 
-public class CreateShowtimeCommandHandler : IRequestHandler<CreateShowtimeCommand, int>
+public class CreateShowtimeCommandHandler : IRequestHandler<CreateShowtimeCommand, CreatedResponse>
 {
     private readonly IApplicationDbContext _context;
 
@@ -23,7 +25,7 @@ public class CreateShowtimeCommandHandler : IRequestHandler<CreateShowtimeComman
         _context = context;
     }
 
-    public async Task<int> Handle(CreateShowtimeCommand request, CancellationToken cancellationToken)
+    public async Task<CreatedResponse> Handle(CreateShowtimeCommand request, CancellationToken cancellationToken)
     {
 
         if (!await _context.Movies.AnyAsync(m => m.Id == request.MovieId))
@@ -63,6 +65,6 @@ public class CreateShowtimeCommandHandler : IRequestHandler<CreateShowtimeComman
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return entity.Id;
+        return new CreatedResponse { Id = entity.Id };
     }
 }
