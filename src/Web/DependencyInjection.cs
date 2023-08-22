@@ -13,7 +13,6 @@ public static class DependencyInjection
     public static IServiceCollection AddWebServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
-        // services.AddCinemaBookingAuthentication(configuration);
 
         services.AddControllers()
             .AddJsonOptions(options =>
@@ -33,24 +32,6 @@ public static class DependencyInjection
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "CinemaBooking API", Version = "v1" });
             var filePath = Path.Combine(System.AppContext.BaseDirectory, "CinemaBooking.xml");
             c.IncludeXmlComments(filePath);
-        });
-
-        return services;
-    }
-
-    private static IServiceCollection AddCinemaBookingAuthentication(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["Jwt:Issuer"],
-                ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
-            };
         });
 
         return services;

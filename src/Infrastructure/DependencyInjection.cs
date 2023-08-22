@@ -1,7 +1,6 @@
 ﻿using CinemaBooking.Application.Common.Interfaces;
 using CinemaBooking.Infrastructure.Data;
 using CinemaBooking.Infrastructure.Data.Interceptors;
-using CinemaBooking.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -22,15 +21,10 @@ public static class DependencyInjection
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
 
-            // options.UseInMemoryDatabase("CinemaBookingDb");
-
             options.UseNpgsql(connectionString);
         });
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
-
-        services.AddTransient<IIdentityService, IdentityService>();
-
 
         return services;
     }

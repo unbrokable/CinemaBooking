@@ -40,13 +40,14 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
         Guard.Against.Null(showtime, nameof(request.ShowtimeId));
 
         IEnumerable<ShowSeat> showSeats = showtime
-            .ShowSeats
-            .Where(s => request.SeatIds.Contains(s.TheaterSeatId) && !s.IsReserved)
+            .ShowSeats   
+            .Where(s => !s.IsReserved)
             .ToList();
 
-        if (showSeats.Count() != request.SeatIds.Count())
+
+        if (!request.SeatIds.All(s => showSeats.Select(s => s.TheaterSeatId).Contains(s)))
         {
-            throw new ArgumentException("Invalid seat ids. Seats are already reserved.");
+            throw new ArgumentException($"Invalid seat ids. Valid values: {string.Join(", ", showSeats.Select(s => s.TheaterSeatId))}");
         }
        
         var entity = new Booking
@@ -72,7 +73,6 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
             .ThenInclude(b => b!.Movie)
             .Include(b => b.Seats)
             .FirstAsync(b => b.Id == entity.Id);
-
 
         BackgroundJob.Schedule<BookingWatcherJob>((j) => j.StartAsync(entity.Id, default), _timeout);
 

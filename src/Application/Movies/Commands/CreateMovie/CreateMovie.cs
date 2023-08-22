@@ -1,8 +1,9 @@
-﻿using CinemaBooking.Domain.Enums;
+﻿using CinemaBooking.Application.Common.Model;
+using CinemaBooking.Domain.Enums;
 
 namespace CinemaBooking.Application.Movies.Commands.CreateMovie;
 
-public record CreateMovieCommand : IRequest<int>
+public record CreateMovieCommand : IRequest<CreatedResponse>
 {
     public required string Title { get; set; }
 
@@ -13,7 +14,7 @@ public record CreateMovieCommand : IRequest<int>
     public MovieGenre Genre { get; set; }
 }
 
-public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, int>
+public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, CreatedResponse>
 {
     private readonly IApplicationDbContext _context;
 
@@ -22,7 +23,7 @@ public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, int
         _context = context;
     }
 
-    public async Task<int> Handle(CreateMovieCommand request, CancellationToken cancellationToken)
+    public async Task<CreatedResponse> Handle(CreateMovieCommand request, CancellationToken cancellationToken)
     {
         var entity = new Movie
         {
@@ -36,6 +37,9 @@ public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, int
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return entity.Id;
+        return new CreatedResponse 
+        { 
+            Id = entity.Id
+        };
     }
 }

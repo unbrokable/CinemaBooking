@@ -1,6 +1,8 @@
-﻿namespace CinemaBooking.Application.Theaters.Commands.CreateTheater;
+﻿using CinemaBooking.Application.Common.Model;
 
-public record CreateTheaterCommand : IRequest<int>
+namespace CinemaBooking.Application.Theaters.Commands.CreateTheater;
+
+public record CreateTheaterCommand : IRequest<CreatedResponse>
 {
     public required string Name { get; set; }
 
@@ -10,7 +12,7 @@ public record CreateTheaterCommand : IRequest<int>
 
 }
 
-public class CreateTheaterCommandHandler : IRequestHandler<CreateTheaterCommand, int>
+public class CreateTheaterCommandHandler : IRequestHandler<CreateTheaterCommand, CreatedResponse>
 {
     private readonly IApplicationDbContext _context;
 
@@ -19,7 +21,7 @@ public class CreateTheaterCommandHandler : IRequestHandler<CreateTheaterCommand,
         _context = context;
     }
 
-    public async Task<int> Handle(CreateTheaterCommand request, CancellationToken cancellationToken)
+    public async Task<CreatedResponse> Handle(CreateTheaterCommand request, CancellationToken cancellationToken)
     {
         var entity = new Theater
         {
@@ -39,6 +41,6 @@ public class CreateTheaterCommandHandler : IRequestHandler<CreateTheaterCommand,
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return entity.Id;
+        return new CreatedResponse { Id = entity.Id };
     }
 }

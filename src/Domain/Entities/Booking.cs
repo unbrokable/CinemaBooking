@@ -4,6 +4,7 @@
     {
         public required string Status { get; set; }
 
+        // Todo: add whem Authentication will be implemented
         //public int UserId { get; set; }
         //public required User User { get; set; }
 
